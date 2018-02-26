@@ -36,24 +36,12 @@ def window_transform_series(series,window_size):
 
 
 # TODO: build an RNN to perform regression on our time series input/output data
-def build_part1_RNN(step_size, window_size):
-    # given - fix random seed - so we can all reproduce the same results on our default time series
-    np.random.seed(0)
-
+def build_part1_RNN(window_size):
     # TODO: build an RNN to perform regression on our time series input/output data
     model = Sequential()
     model.add(LSTM(5, input_shape=(window_size, 1)))
     model.add(Dense(1))
-
-    # build model using keras documentation recommended optimizer initialization
-    optimizer = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
-
-    # compile the model
-    model.compile(loss='mean_squared_error', optimizer=optimizer)
-
-    # run your model!
-    model.fit(X_train, y_train, epochs=1000, batch_size=50, verbose=0)
-
+    
     return model
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+import string
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -13,23 +14,14 @@ def window_transform_series(series,window_size):
     X = []
     y = []
     
-    # From 0 to p-t
     for i in range(len(series) - window_size):  
-        inp = []
-        
-        # Pick next window_size elems
-        for j in range(i, i + window_size):
-            inp.append(series[j])
-            
-        # Add input and output
-        X.append(inp)
+        X.append([series[j] for j in range(i, i + window_size)])
         y.append(series[i+window_size])
-        
-        
-    # reshape each 
-    X = np.asarray(X)
+     
+    # reshape
+    X       = np.asarray(X)
     X.shape = (np.shape(X)[0:2])
-    y = np.asarray(y)
+    y       = np.asarray(y)
     y.shape = (len(y),1)
     
     return X,y
@@ -48,34 +40,25 @@ def build_part1_RNN(window_size):
 
 ### TODO: return the text input with only ascii lowercase and the punctuation given below included.
 def cleaned_text(text):
-    import string
-    alphabet = string.ascii_lowercase + ' '
-    punctuation = ['!', ',', '.', ':', ';', '?']
-    keepchars = alphabet + ''.join(punctuation)
-    #convert to list and replace unwanted chars with blanks
-    listtext = list(text)
-    for i,char in enumerate(listtext):
-        if char not in keepchars:
-            listtext[i] = ' '
-    text = ''.join(listtext)
-    return text
+    alphabetAndPunctuation = set(string.ascii_lowercase + ' ' + ''.join(['!', ',', '.', ':', ';', '?']))
+    newText = []
+    for char in text:
+        if char in alphabetAndPunctuation:
+            newText.append(char)
+        else:
+            newText.append(' ')
+    return ''.join(newText)
 
 
 ### TODO: fill out the function below that transforms the input text and window-size into a set of input/output pairs for use with our RNN model
 def window_transform_text(text,window_size,step_size):
-    # containers for input/output pairs
-    inputs = []
+    inputs  = []
     outputs = []
-    ctr = 0
     
-    # Goes from window_size until the end, and pick previous characters
-    for i in range(window_size, len(text), step_size):
-        inputs.append(text[ctr:i])
-        outputs.append(text[i])
-        ctr = ctr + step_size
+    for textSlice in range(0, len(text) - window_size, step_size):
+        inputs.append(text[textSlice:textSlice + window_size])
+        outputs.append(text[textSlice + window_size])
     
-    return inputs,outputs
-
     return inputs,outputs
 
 # TODO build the required RNN model: 
